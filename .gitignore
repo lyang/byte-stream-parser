@@ -1,0 +1,10 @@
+# Bazel
+bazel-*
+
+# IntelliJ IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+.ijwb
+
