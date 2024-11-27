@@ -2,3 +2,28 @@ module(
     name = "byte-stream-parser",
     version = "0.0.1",
 )
+
+bazel_dep(
+    name = "contrib_rules_jvm",
+    version = "0.27.0",
+)
+bazel_dep(
+    name = "rules_jvm_external",
+    version = "6.6",
+)
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        "org.assertj:assertj-core:3.26.3",
+        "org.junit.jupiter:junit-jupiter-api:5.11.3",
+        "org.junit.jupiter:junit-jupiter-engine:5.11.3",
+        "org.junit.platform:junit-platform-launcher:1.11.3",
+        "org.junit.platform:junit-platform-reporting:1.11.3",
+    ],
+    fail_if_repin_required = True,
+    fetch_sources = True,
+    lock_file = "//:maven_install.json",
+    strict_visibility = True,
+)
+use_repo(maven, "maven")

@@ -1,0 +1,13 @@
+load("@contrib_rules_jvm//java:defs.bzl", "JUNIT5_DEPS", "java_test_suite")
+
+java_test_suite(
+    name = "data",
+    size = "small",
+    srcs = glob(["*.java"]),
+    runner = "junit5",
+    runtime_deps = JUNIT5_DEPS,
+    deps = [
+        "//src/test/java/com/github/lyang/bytestreamparser/api/data/testing",
+        "@maven//:org_junit_jupiter_junit_jupiter_api",
+    ],
+)
