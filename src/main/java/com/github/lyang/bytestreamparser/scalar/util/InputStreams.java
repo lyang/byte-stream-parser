@@ -10,7 +10,7 @@ public final class InputStreams {
   private static final String END_OF_BYTE_STREAM_REACHED =
       "End of stream reached after reading %d bytes, bytes expected %d";
 
-    private InputStreams() {}
+  private InputStreams() {}
 
   public static byte[] readFully(InputStream input, int length) throws IOException {
     byte[] bytes = new byte[length];
