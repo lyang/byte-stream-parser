@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  coverage:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,13 +30,9 @@ jobs:
       - name: Run tests with coverage
         run: bazel coverage //...
 
-      - name: Get coverage data
-        id: coverage
-        run: echo "data=$(bazel info output_path)/_coverage/_coverage_report.dat" >> $GITHUB_OUTPUT
-
       - name: Upload coverage data
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
-          files: ${{ steps.coverage.outputs.data }}
+          files: bazel-out/_coverage/_coverage_report.dat
           token: ${{ secrets.CODECOV_TOKEN }}
