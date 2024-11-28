@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up bazel
+        uses: bazel-contrib/setup-bazel@0.9.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            common --enable_bzlmod
+            common --java_language_version=21
+            common --java_runtime_version=21
+            coverage --combined_report=lcov
+
+      - name: Run tests with coverage
+        run: bazel coverage //...
+
+      - name: Get coverage data
+        id: coverage
+        run: echo "data=$(bazel info output_path)/_coverage/_coverage_report.dat" >> $GITHUB_OUTPUT
+
+      - name: Upload coverage data
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          files: ${{ steps.coverage.outputs.data }}
+          token: ${{ secrets.CODECOV_TOKEN }}
