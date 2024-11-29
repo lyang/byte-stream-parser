@@ -9,6 +9,8 @@ import java.nio.charset.Charset;
 public final class InputStreams {
   private static final String END_OF_BYTE_STREAM_REACHED =
       "End of stream reached after reading %d bytes, bytes expected %d";
+  private static final String END_OF_CHAR_STREAM_REACHED =
+      "End of stream reached after reading %d chars, chars expected %d";
 
   private InputStreams() {}
 
@@ -27,5 +29,23 @@ public final class InputStreams {
       throw new EOFException(String.format(END_OF_BYTE_STREAM_REACHED, total, length));
     }
     return bytes;
+  }
+
+  public static String readFully(InputStream input, int length, Charset charset)
+      throws IOException {
+    InputStreamReader reader = new InputStreamReader(input, charset);
+    char[] chars = new char[length];
+    int total = 0;
+    while (total < length) {
+      int read = reader.read(chars, total, length - total);
+      if (read == -1) {
+        break;
+      }
+      total += read;
+    }
+    if (total != length) {
+      throw new EOFException(String.format(END_OF_CHAR_STREAM_REACHED, total, length));
+    }
+    return new String(chars);
   }
 }
