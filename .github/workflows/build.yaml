@@ -7,7 +7,8 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -29,6 +30,17 @@ jobs:
 
       - name: Run tests with coverage
         run: bazel coverage //...
+
+      - name: Copy Test Results
+        if: always()
+        run: |
+          cp -Lpr bazel-testlogs .generated
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.18.0
+        if: always()
+        with:
+          files: .generated/bazel-testlogs/**/test.xml
 
       - name: Upload coverage data
         uses: codecov/codecov-action@v5
