@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "parser",
+    srcs = glob(["*.java"]),
+    exports = [
+        "//src/main/java/io/github/lyang/bytestreamparser/scalar/parser",
+    ],
+    deps = [
+        "//src/main/java/io/github/lyang/bytestreamparser/scalar/parser",
+    ],
+)
