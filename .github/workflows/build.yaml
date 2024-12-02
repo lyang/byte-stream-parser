@@ -8,6 +8,7 @@ on:
 
 permissions:
   checks: write
+  packages: write
   pull-requests: write
 
 jobs:
@@ -44,7 +45,62 @@ jobs:
 
       - name: Upload coverage data
         uses: codecov/codecov-action@v5
+        if: always()
         with:
           fail_ci_if_error: true
           files: bazel-out/_coverage/_coverage_report.dat
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  Release:
+    needs: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up bazel
+        uses: bazel-contrib/setup-bazel@0.9.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            common --enable_bzlmod
+            common --java_language_version=21
+            common --java_runtime_version=21
+            coverage --combined_report=lcov
+
+      - name: Set release variable (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "SOURCE=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Set release variable (branch)
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "SOURCE=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Release
+        id: release
+        env:
+          MAVEN_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
+          MAVEN_USER: "${{ github.actor }}"
+          MAVEN_REPO: "https://maven.pkg.github.com/${{ github.repository }}"
+        run: |
+          ./release.sh >> $GITHUB_OUTPUT
+
+      - name: Comment (pull request)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Version `${{ steps.release.outputs.release }}` is deployed!'
+            })
+
+      - name: Release summary
+        run: |
+          echo "Version \`${{ steps.release.outputs.release }}\` is deployed!" >> $GITHUB_STEP_SUMMARY
