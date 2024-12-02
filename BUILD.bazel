@@ -1,0 +1,10 @@
+load("@rules_jvm_external//:defs.bzl", "java_export")
+
+RELEASE = "0.0.0"
+
+java_export(
+    name = "byte-stream-parser",
+    srcs = glob(["src/main/java/io/github/lyang/bytestreamparser/**/*.java"]),
+    maven_coordinates = "io.github.lyang:byte-stream-parser:%s" % RELEASE,
+    pom_template = ":pom.tpl",
+)
