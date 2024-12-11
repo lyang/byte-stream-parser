@@ -1,0 +1,14 @@
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "testing",
+    srcs = glob(["*.java"]),
+    exports = [
+        "//src/main/java/org/bytestreamparser/api/data",
+        "@maven//:org_assertj_assertj_core",
+    ],
+    deps = [
+        "//src/main/java/org/bytestreamparser/api/data",
+        "@maven//:org_assertj_assertj_core",
+    ],
+)

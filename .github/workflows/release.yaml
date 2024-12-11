@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up bazel
+        uses: bazel-contrib/setup-bazel@0.9.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            common --enable_bzlmod
+            common --java_language_version=21
+            common --java_runtime_version=21
+            coverage --combined_report=lcov
+
+      - name: Set release variable (central)
+        run: |
+          echo "SOURCE=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Release to GitHub Packages
+        env:
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USER: ${{ github.actor }}
+        run: |
+          bazel run --define "maven_repo=https://maven.pkg.github.com/${{ github.repository }}" //:byte-stream-parser.publish

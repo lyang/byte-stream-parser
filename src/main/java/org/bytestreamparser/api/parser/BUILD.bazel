@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "parser",
+    srcs = glob(["*.java"]),
+    exports = [
+        "//src/main/java/org/bytestreamparser/api/data",
+    ],
+    deps = [
+        "//src/main/java/org/bytestreamparser/api/data",
+    ],
+)
