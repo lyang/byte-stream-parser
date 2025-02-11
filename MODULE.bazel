@@ -9,7 +9,7 @@ bazel_dep(
 )
 bazel_dep(
     name = "rules_jvm_external",
-    version = "6.6",
+    version = "6.7",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
